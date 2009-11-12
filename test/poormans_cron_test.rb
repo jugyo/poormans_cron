@@ -2,12 +2,18 @@ require 'test_helper'
 
 class MyController < ActionController::Base
   def index
+    render :text => ''
+  end
+
+  def error
+    raise 'error!'
   end
 end
 
 class PoormansCronTest < ActionController::TestCase
   def setup
     @controller = MyController.new
+    stub(Thread).start { |block| block.call }
   end
 
   def test_for_filter
@@ -15,11 +21,16 @@ class PoormansCronTest < ActionController::TestCase
     get :index
   end
 
-  def test_for_skip_filter
+  def _test_for_skip_filter
     MyController.class_eval do
-      skip_before_filter PoormansCron::Filter
+      skip_after_filter PoormansCron::Filter
     end
     mock(PoormansCron::Filter).filter(@controller).times(0)
     get :index
+  end
+
+  def test_for_filter_when_error
+    mock(PoormansCron).perform {}
+    get :error
   end
 end
