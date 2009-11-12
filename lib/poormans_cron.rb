@@ -18,5 +18,5 @@ module PoormansCron
 end
 
 class ActionController::Base
-  prepend_before_filter PoormansCron::Filter
+  around_filter PoormansCron::Filter
 end
