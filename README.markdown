@@ -1,6 +1,6 @@
 # PoormansCron
 
-http://github.com/jugyo/poormans_cron
+[http://github.com/jugyo/poormans_cron](http://github.com/jugyo/poormans_cron)
 
 ## Description
 
@@ -19,13 +19,17 @@ Create a table named 'poormans_crons' as following:
       t.column :performed_at, :datetime
     end
 
-### Create cron
+### Create crons
 
-    PoormansCron::Cron.create(:name => 'foo', :interval => 60)
+For example, create crons by migration as following:
+
+    PoormansCron::Cron.create(:name => 'hourly', :interval => 60 * 60)
 
 ### Register jobs
 
-    PoormansCron.register_job(:foo) do
+For example, write config/initializers/poormans_crons.rb as following:
+
+    PoormansCron.register_job(:hourly) do
       # do something
     end
 
