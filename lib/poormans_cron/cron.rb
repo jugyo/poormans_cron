@@ -21,10 +21,8 @@ module PoormansCron
     end
 
     def perform
-      Thread.start do
-        PoormansCron.jobs[name].each do |job|
-          job.call
-        end
+      PoormansCron.jobs[name].each do |job|
+        job.call
       end
     end
   end

@@ -33,7 +33,7 @@ class CronTest < ActiveSupport::TestCase
 
         should 'called perform' do
           mock(@block).call.times(1) {}
-          @cron.perform
+          PoormansCron.perform
         end
       end
 
@@ -43,13 +43,12 @@ class CronTest < ActiveSupport::TestCase
           PoormansCron.register_job(:foo, &@block1)
           @block2 = lambda {}
           PoormansCron.register_job(:foo, &@block2)
-          stub(Thread).start.with_any_args { |block| block.call }
         end
 
         should 'called perform' do
           mock(@block1).call.times(1) {}
           mock(@block2).call.times(1) {}
-          @cron.perform
+          PoormansCron.perform
         end
       end
     end

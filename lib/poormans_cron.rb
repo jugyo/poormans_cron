@@ -2,12 +2,18 @@ require 'poormans_cron/cron'
 require 'poormans_cron/filter'
 
 module PoormansCron
-  def self.jobs
-    @jobs ||= Hash.new([])
-  end
+  class << self
+    def jobs
+      @jobs ||= Hash.new([])
+    end
 
-  def self.register_job(name, &block)
-    jobs[name.to_s] << block
+    def register_job(name, &block)
+      jobs[name.to_s] << block
+    end
+
+    def perform
+      Cron.perform_expired_crons
+    end
   end
 end
 
