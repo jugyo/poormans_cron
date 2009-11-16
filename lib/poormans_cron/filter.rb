@@ -5,7 +5,7 @@ module PoormansCron
         yield
       ensure
         Thread.start do
-          PoormansCron.perform
+          PoormansCron::Cron.perform
         end
       end
     end

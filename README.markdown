@@ -29,7 +29,7 @@ For example, create crons by migration as following:
 
 For example, write config/initializers/poormans_crons.rb as following:
 
-    PoormansCron.register_job(:hourly) do
+    PoormansCron::Cron.register_job(:hourly) do
       # do something
     end
 

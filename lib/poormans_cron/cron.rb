@@ -18,10 +18,22 @@ module PoormansCron
           cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
         end
       end
+
+      def jobs
+        @jobs ||= Hash.new([])
+      end
+
+      def register_job(name, &block)
+        jobs[name.to_s] << block
+      end
+
+      def perform
+        perform_expired_crons
+      end
     end
 
     def perform
-      PoormansCron.jobs[name].each do |job|
+      self.class.jobs[name].each do |job|
         job.call
       end
     end

@@ -30,7 +30,7 @@ class PoormansCronTest < ActionController::TestCase
   end
 
   def test_for_filter_when_error
-    mock(PoormansCron).perform {}
+    mock(PoormansCron::Cron).perform {}
     get :error
   end
 end

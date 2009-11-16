@@ -27,28 +27,28 @@ class CronTest < ActiveSupport::TestCase
       context 'a job was registered' do
         setup do
           @block = lambda {}
-          PoormansCron.register_job(:foo, &@block)
+          PoormansCron::Cron.register_job(:foo, &@block)
           stub(Thread).start.with_any_args { |block| block.call }
         end
 
         should 'called perform' do
           mock(@block).call.times(1) {}
-          PoormansCron.perform
+          PoormansCron::Cron.perform
         end
       end
 
       context 'jobs was registered' do
         setup do
           @block1 = lambda {}
-          PoormansCron.register_job(:foo, &@block1)
+          PoormansCron::Cron.register_job(:foo, &@block1)
           @block2 = lambda {}
-          PoormansCron.register_job(:foo, &@block2)
+          PoormansCron::Cron.register_job(:foo, &@block2)
         end
 
         should 'called perform' do
           mock(@block1).call.times(1) {}
           mock(@block2).call.times(1) {}
-          PoormansCron.perform
+          PoormansCron::Cron.perform
         end
       end
     end
