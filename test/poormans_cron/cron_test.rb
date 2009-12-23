@@ -21,7 +21,7 @@ class CronTest < ActiveSupport::TestCase
       should 'called perform' do
         mock(PoormansCron::Cron).expired_crons.with_any_args.times(1) { [@cron] }
         mock(@cron).perform.times(1) {}
-        PoormansCron::Cron.perform_expired_crons
+        PoormansCron::Cron.perform
       end
 
       context 'a job was registered' do
@@ -29,6 +29,10 @@ class CronTest < ActiveSupport::TestCase
           @block = lambda {}
           PoormansCron::Cron.register_job(:foo, &@block)
           stub(Thread).start.with_any_args { |block| block.call }
+        end
+
+        should 'registered job' do
+          assert PoormansCron::Cron.jobs[:foo].include?(@block)
         end
 
         should 'called perform' do

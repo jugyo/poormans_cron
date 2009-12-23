@@ -3,13 +3,19 @@ module PoormansCron
     set_table_name "poormans_crons"
 
     class << self
-      def perform_expired_crons
+      def perform
+        crons = nil
+
         self.transaction do
           now = Time.new
-          expired_crons(now).each do |cron|
+          crons = expired_crons(now)
+          crons.each do |cron|
             cron.update_attribute(:performed_at, now)
-            cron.perform
           end
+        end
+
+        crons.each do |cron|
+          cron.perform
         end
       end
 
@@ -20,20 +26,18 @@ module PoormansCron
       end
 
       def jobs
-        @jobs ||= Hash.new([])
+        @jobs ||= {}
       end
 
       def register_job(name, &block)
-        jobs[name.to_s] << block
-      end
-
-      def perform
-        perform_expired_crons
+        name = name.to_sym
+        jobs[name] = [] unless jobs.key?(name)
+        jobs[name] << block
       end
     end
 
     def perform
-      self.class.jobs[name].each do |job|
+      self.class.jobs[name.to_sym].each do |job|
         job.call
       end
     end
