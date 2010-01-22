@@ -12,11 +12,20 @@ PoormansCron is a poor man's cron.
 
 Create a table named 'poormans_crons' as following:
 
-    create_table :poormans_crons, :force => true do |t|
-      t.column :id,           :integer
-      t.column :name,         :string
-      t.column :interval,     :integer
-      t.column :performed_at, :datetime
+    class CreatePoormansCrons < ActiveRecord::Migration
+      def self.up
+        create_table :poormans_crons, :force => true do |t|
+          t.column :id,           :integer
+          t.column :name,         :string
+          t.column :in_progress,  :boolean, :default => false
+          t.column :interval,     :integer
+          t.column :performed_at, :datetime
+        end
+      end
+
+      def self.down
+        drop_table :poormans_crons
+      end
     end
 
 ### Create crons
