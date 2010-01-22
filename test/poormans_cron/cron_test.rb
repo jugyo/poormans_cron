@@ -9,9 +9,9 @@ class CronTest < ActiveSupport::TestCase
       stub(Time).now { @now }
     end
 
-    context 'performed_at is nil' do
+    context 'performed_at is nil and in_progress is false' do
       setup do
-        @cron.update_attribute(:performed_at, nil)
+        @cron.update_attributes(:performed_at => nil, :in_progress => false)
       end
 
       should 'get expired_crons' do
