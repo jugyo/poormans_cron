@@ -2,6 +2,8 @@ module PoormansCron
   class Cron < ActiveRecord::Base
     set_table_name "poormans_crons"
 
+    DEFAULT_WAIT_TIME = 60 * 60
+
     class << self
       def perform
         crons = nil
@@ -26,8 +28,20 @@ module PoormansCron
       end
 
       def expired_crons(time)
-        find_all_by_in_progress(false).select do |cron|
-          cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
+        find(:all).select do |cron|
+          unless cron.in_progress
+            cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
+          else
+            (time - cron.performed_at) > expire_time
+          end
+        end
+      end
+
+      def expire_time
+        if defined? WAIT_TIME
+          WAIT_TIME
+        else
+          DEFAULT_WAIT_TIME
         end
       end
 

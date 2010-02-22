@@ -66,5 +66,28 @@ class CronTest < ActiveSupport::TestCase
         assert_equal 0, PoormansCron::Cron.expired_crons(@now).size
       end
     end
+
+    context 'set WAIT_TIME' do
+      setup do
+        PoormansCron::Cron::WAIT_TIME = 60 * 30
+      end
+
+      should 'return expire_time' do
+        assert_equal 60 * 30, PoormansCron::Cron.expire_time
+      end
+
+      context 'set @cron.performed_at to expire' do
+        setup do
+          @cron.update_attribute(
+            :performed_at,
+            Time.now - PoormansCron::Cron.expire_time - 1
+          )
+        end
+
+        should 'return expired cron' do
+          assert_equal 1, PoormansCron::Cron.expired_crons(@now).size
+        end
+      end
+    end
   end
 end
