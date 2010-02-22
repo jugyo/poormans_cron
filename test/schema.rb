@@ -5,5 +5,6 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :interval,     :integer
     t.column :in_progress,  :boolean, :default => true
     t.column :performed_at, :datetime
+    t.column :wait_time,    :integer
   end
 end

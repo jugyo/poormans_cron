@@ -67,20 +67,16 @@ class CronTest < ActiveSupport::TestCase
       end
     end
 
-    context 'set WAIT_TIME' do
+    context 'set wait_time' do
       setup do
-        PoormansCron::Cron::WAIT_TIME = 60 * 30
-      end
-
-      should 'return expire_time' do
-        assert_equal 60 * 30, PoormansCron::Cron.expire_time
+        @cron.wait_time = 60 * 30
       end
 
       context 'set @cron.performed_at to expire' do
         setup do
           @cron.update_attribute(
             :performed_at,
-            Time.now - PoormansCron::Cron.expire_time - 1
+            Time.now - @cron.wait_time - 1
           )
         end
 

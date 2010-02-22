@@ -32,16 +32,8 @@ module PoormansCron
           unless cron.in_progress
             cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
           else
-            (time - cron.performed_at) > expire_time
+            (time - cron.performed_at) > (cron.wait_time || DEFAULT_WAIT_TIME)
           end
-        end
-      end
-
-      def expire_time
-        if defined? WAIT_TIME
-          WAIT_TIME
-        else
-          DEFAULT_WAIT_TIME
         end
       end
 
