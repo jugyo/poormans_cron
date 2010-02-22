@@ -6,7 +6,7 @@ module PoormansCron
 
     class << self
       def perform
-        crons = nil
+        crons = []
 
         self.transaction do
           now = Time.new
@@ -16,11 +16,10 @@ module PoormansCron
           end
         end
 
-        return unless crons
-
         crons.each do |cron|
           cron.perform
         end
+
       ensure
         self.transaction do
           crons.each do |cron|
