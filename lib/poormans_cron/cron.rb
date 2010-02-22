@@ -16,6 +16,8 @@ module PoormansCron
           end
         end
 
+        return unless crons
+
         crons.each do |cron|
           cron.perform
         end
@@ -28,11 +30,11 @@ module PoormansCron
       end
 
       def expired_crons(time)
-        find(:all).select do |cron|
+        find(:all, :lock => true).select do |cron|
           unless cron.in_progress
             cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
           else
-            (time - cron.performed_at) > (cron.wait_time || DEFAULT_WAIT_TIME)
+            (time - cron.performed_at).to_i > (cron.wait_time || DEFAULT_WAIT_TIME)
           end
         end
       end
@@ -49,8 +51,10 @@ module PoormansCron
     end
 
     def perform
-      self.class.jobs[name.to_sym].each do |job|
-        job.call
+      if jobs = self.class.jobs[name.to_sym]
+        jobs.each do |job|
+          job.call
+        end
       end
     end
   end
