@@ -9,17 +9,34 @@ class CronTest < ActiveSupport::TestCase
       stub(Time).now { @now }
     end
 
+    context '2 crons' do
+      setup do
+        @other_cron = PoormansCron::Cron.create!(:name => 'bar', :interval => 60)
+        @cron.update_attribute(:in_progress, false)
+        @other_cron.update_attribute(:in_progress, false)
+      end
+
+      should 'get expired_cron order by performed_at' do
+        @cron.update_attribute(:performed_at, @now - 100)
+        @other_cron.update_attribute(:performed_at, @now - 101)
+        PoormansCron::Cron.expired_cron(@now)
+        assert_equal @other_cron, PoormansCron::Cron.expired_cron(@now)
+        @other_cron.update_attribute(:performed_at, @now - 99)
+        assert_equal @cron, PoormansCron::Cron.expired_cron(@now)
+      end
+    end
+
     context 'performed_at is nil and in_progress is false' do
       setup do
         @cron.update_attributes(:performed_at => nil, :in_progress => false)
       end
 
-      should 'get expired_crons' do
-        assert_equal 1, PoormansCron::Cron.expired_crons(@now).size
+      should 'get expired_cron' do
+        assert_not_nil PoormansCron::Cron.expired_cron(@now)
       end
 
       should 'called perform' do
-        mock(PoormansCron::Cron).expired_crons.with_any_args.times(1) { [@cron] }
+        mock(PoormansCron::Cron).expired_cron.with_any_args.times(1) { @cron }
         mock(@cron).perform.times(1) {}
         PoormansCron::Cron.perform
       end
@@ -63,7 +80,7 @@ class CronTest < ActiveSupport::TestCase
       end
 
       should 'get no expired_cron' do
-        assert_equal 0, PoormansCron::Cron.expired_crons(@now).size
+        assert_nil PoormansCron::Cron.expired_cron(@now)
       end
     end
 
@@ -81,7 +98,7 @@ class CronTest < ActiveSupport::TestCase
         end
 
         should 'return expired cron' do
-          assert_equal 1, PoormansCron::Cron.expired_crons(@now).size
+          assert_not_nil PoormansCron::Cron.expired_cron(@now)
         end
       end
     end

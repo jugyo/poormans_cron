@@ -6,36 +6,32 @@ module PoormansCron
 
     class << self
       def perform
-        crons = []
+        cron = nil
 
         self.transaction do
           now = Time.new
-          crons = expired_crons(now)
-          crons.each do |cron|
-            cron.update_attributes(:performed_at => now, :in_progress => true)
-          end
+          cron = expired_cron(now)
+          cron.update_attributes(:performed_at => now, :in_progress => true)
         end
 
-        crons.each do |cron|
-          cron.perform
-        end
+        cron.perform if cron
 
       ensure
-        self.transaction do
-          crons.each do |cron|
-            cron.update_attributes(:in_progress => false)
-          end
-        end
+        cron.update_attributes(:in_progress => false) if cron
       end
 
-      def expired_crons(time)
-        find(:all, :lock => true).select do |cron|
+      def expired_cron(time)
+        find(:all, :order => 'performed_at', :lock => true).select { |cron|
           unless cron.in_progress
             cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
           else
-            (time - cron.performed_at).to_i > (cron.wait_time || DEFAULT_WAIT_TIME)
+            if cron.performed_at
+              (time - cron.performed_at).to_i > (cron.wait_time || DEFAULT_WAIT_TIME)
+            else
+              true
+            end
           end
-        end
+        }.first
       end
 
       def jobs
