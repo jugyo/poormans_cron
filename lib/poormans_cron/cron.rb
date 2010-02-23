@@ -11,7 +11,7 @@ module PoormansCron
         self.transaction do
           now = Time.new
           cron = expired_cron(now)
-          cron.update_attributes(:performed_at => now, :in_progress => true)
+          cron.update_attributes(:performed_at => now, :in_progress => true) if cron
         end
 
         cron.perform if cron
