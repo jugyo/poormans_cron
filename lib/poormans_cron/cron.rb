@@ -10,8 +10,12 @@ module PoormansCron
 
         self.transaction do
           now = Time.new
-          cron = expired_cron(now)
-          cron.update_attributes(:performed_at => now, :in_progress => true) if cron
+          if cron = expired_cron(now)
+            cron.update_attributes(
+              :performed_at => now,
+              :in_progress  => true
+            )
+          end
         end
 
         cron.perform if cron
@@ -22,13 +26,11 @@ module PoormansCron
 
       def expired_cron(time)
         find(:all, :order => 'performed_at', :lock => true).select { |cron|
-          unless cron.in_progress
+          if !cron.async || !cron.in_progress
             cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
           else
             if cron.performed_at
               (time - cron.performed_at).to_i > (cron.wait_time || DEFAULT_WAIT_TIME)
-            else
-              true
             end
           end
         }.first

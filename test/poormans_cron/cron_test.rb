@@ -26,6 +26,32 @@ class CronTest < ActiveSupport::TestCase
       end
     end
 
+    context 'performed_at is nil and in_progress is true' do
+      setup do
+        @cron.update_attributes(:performed_at => nil, :in_progress => true)
+      end
+
+      context 'async is false' do
+        setup do
+          @cron.update_attributes(:async => false)
+        end
+
+        should 'get expired_cron' do
+          assert_not_nil PoormansCron::Cron.expired_cron(@now)
+        end
+      end
+
+      context 'async is true' do
+        setup do
+          @cron.update_attributes(:async => true)
+        end
+
+        should 'get no expired_cron' do
+          assert_nil PoormansCron::Cron.expired_cron(@now)
+        end
+      end
+    end
+
     context 'performed_at is nil and in_progress is false' do
       setup do
         @cron.update_attributes(:performed_at => nil, :in_progress => false)
