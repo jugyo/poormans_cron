@@ -74,7 +74,7 @@ class CronTest < ActiveSupport::TestCase
           stub(Thread).start.with_any_args { |block| block.call }
         end
 
-        should 'registered job' do
+        should 'a job was registered' do
           assert PoormansCron::Cron.jobs[:foo].include?(@block)
         end
 
