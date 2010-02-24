@@ -48,8 +48,10 @@ module PoormansCron
     end
 
     def perform
+      logger.info "[poormans_cron] perform cron. name='#{name}'. pid=#{Process.pid}"
       if jobs = self.class.jobs[name.to_sym]
         jobs.each do |job|
+          logger.info "[poormans_cron]   call job. #{job.inspect}"
           job.call
         end
       end
