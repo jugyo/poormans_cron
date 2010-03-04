@@ -1,5 +1,9 @@
 require 'test_helper'
 
+class ActionController::Base
+  include PoormansCron
+end
+
 class MyController < ActionController::Base
   def index
     render :text => ''
@@ -30,7 +34,7 @@ class PoormansCronTest < ActionController::TestCase
   end
 
   def test_for_filter_when_error
-    mock(PoormansCron::Cron).perform {}
+    mock(PoormansCron::Cron).perform.times(0)
     get :error
   end
 end
