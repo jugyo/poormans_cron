@@ -44,4 +44,16 @@ For example, write config/initializers/poormans_crons.rb as following:
       # do something
     end
 
+### Include module
+
+    class ApplicationController < ActionController::Base
+      include PoormansCron
+      ...
+
+### Filtering
+
+    PoormansCron.filter do |controller|
+      controller.controller_name == "foo" && controller.action_name == "bar"
+    end
+
 Copyright (c) 2009 jugyo, released under the MIT license
