@@ -8,24 +8,25 @@ module PoormansCron
       def perform
         cron = nil
 
-        self.transaction do
-          now = Time.new
-          if cron = expired_cron(now)
-            cron.update_attributes(
-              :performed_at => now,
-              :in_progress  => true
-            )
-          end
+        now = Time.new
+        cron = expired_cron(now)
+        return unless cron
+
+        begin
+          cron.update_attributes(:performed_at => now, :in_progress  => true)
+        rescue ActiveRecord::StaleObjectError
+          return
         end
 
-        cron.perform if cron
-
-      ensure
-        cron.update_attributes(:in_progress => false) if cron
+        begin
+          cron.perform
+        ensure
+          cron.update_attributes(:in_progress => false) if cron
+        end
       end
 
       def expired_cron(time)
-        find(:all, :order => 'performed_at', :lock => true).select { |cron|
+        find(:all, :order => 'performed_at').select { |cron|
           if !cron.async || !cron.in_progress
             cron.performed_at.nil? || time > (cron.performed_at + cron.interval)
           else

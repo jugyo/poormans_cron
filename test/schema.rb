@@ -7,5 +7,6 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :performed_at, :datetime
     t.column :wait_time,    :integer
     t.column :async,        :boolean, :default => true
+    t.column :lock_version, :integer, :default => 0
   end
 end

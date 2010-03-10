@@ -21,7 +21,8 @@ Create a table named 'poormans_crons' as following:
           t.column :interval,     :integer
           t.column :performed_at, :datetime
           t.column :wait_time,    :integer
-          t.column :async         :boolean, :default => false
+          t.column :async,        :boolean, :default => false
+          t.column :lock_version, :integer, :default => 0
         end
       end
 
